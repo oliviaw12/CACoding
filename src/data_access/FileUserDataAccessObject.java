@@ -2,6 +2,7 @@ package data_access;
 
 import entity.User;
 import entity.UserFactory;
+import use_case.clear_users.ClearUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
@@ -10,14 +11,17 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
-public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface {
+public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface, ClearUserDataAccessInterface {
 
     private final File csvFile;
 
     private final Map<String, Integer> headers = new LinkedHashMap<>();
 
     private final Map<String, User> accounts = new HashMap<>();
+
+    private final StringBuilder deletedUsers = new StringBuilder();
 
     private UserFactory userFactory;
 
@@ -32,7 +36,6 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
         if (csvFile.length() == 0) {
             save();
         } else {
-
             try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
                 String header = reader.readLine();
 
@@ -94,6 +97,29 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
     @Override
     public boolean existsByName(String identifier) {
         return accounts.containsKey(identifier);
+    }
+
+    public String delete() {
+        for (User account : accounts.values()) {
+            this.deletedUsers.append(account.getName());
+        }
+        // this line of code deletes all the users from the mapping
+        accounts.clear();
+        save();
+
+        //removing it from the csv file
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(csvFile));
+
+            // Close the file to ensure changes are saved
+            writer.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return deletedUsers.toString();
     }
 
 }

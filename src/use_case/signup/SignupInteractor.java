@@ -25,7 +25,6 @@ public class SignupInteractor implements SignupInputBoundary {
         } else if (!signupInputData.getPassword().equals(signupInputData.getRepeatPassword())) {
             userPresenter.prepareFailView("Passwords don't match.");
         } else {
-
             LocalDateTime now = LocalDateTime.now();
             User user = userFactory.create(signupInputData.getUsername(), signupInputData.getPassword(), now);
             userDataAccessObject.save(user);
