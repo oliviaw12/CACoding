@@ -26,6 +26,5 @@ public class ClearViewModel extends ViewModel {
     public ClearState getState() {
         return state;
     }
-
 }
 
