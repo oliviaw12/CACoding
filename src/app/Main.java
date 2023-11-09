@@ -3,12 +3,16 @@ package app;
 import data_access.FileUserDataAccessObject;
 import entity.CommonUserFactory;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.logged_out.LoggedOutViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
+import view.LoggedInView;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.logout.LogoutViewModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.clear_users.ClearViewModel;
 import use_case.clear_users.ClearUserDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
+import use_case.logout.LogoutUserDataAccessInterface;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
@@ -48,11 +52,13 @@ public class Main {
         SignupViewModel signupViewModel = new SignupViewModel();
         ClearViewModel clearViewModel = new ClearViewModel();
 
+        LogoutViewModel logoutViewModel = new LogoutViewModel();
+       // LoggedOutViewModel loggedOutViewModel = new LoggedOutViewModel();
+
         FileUserDataAccessObject userDataAccessObject;
-       // FileUserDataAccessObject clearUserDataAccessObject;
+
         try {
             userDataAccessObject = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
-           // clearUserDataAccessObject = new FileUserDataAccessObject("./users.csv", new CommonUserFactory());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,7 +69,7 @@ public class Main {
         LoginView loginView = LoginUseCaseFactory.create(viewManagerModel, loginViewModel, loggedInViewModel, userDataAccessObject);
         views.add(loginView, loginView.viewName);
 
-        LoggedInView loggedInView = new LoggedInView(loggedInViewModel);
+        LoggedInView loggedInView = LoggedInUseCaseFactory.create(viewManagerModel, loggedInViewModel, logoutViewModel, userDataAccessObject, loginViewModel);
         views.add(loggedInView, loggedInView.viewName);
 
         viewManagerModel.setActiveView(signupView.viewName);
